@@ -1,6 +1,6 @@
 # 🔍 Accessibility Audit Engine
 
-A professional-grade, state-of-the-art accessibility auditing tool built with Next.js and Playwright. This application allows developers and designers to scan websites or HTML snippets for WCAG violations and offers actionable remediation steps with visual context.
+An accessibility auditing tool built with Next.js, axe-core and Playwright. This application allows developers and designers to scan websites or HTML snippets for WCAG violations and offers actionable remediation steps with visual context.
 
 ## ✨ Features
 
