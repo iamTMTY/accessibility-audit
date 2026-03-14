@@ -53,7 +53,7 @@ To run Playwright in Vercel's serverless environment, you need a remote browser 
    - Value: `[Your-API-Key]`
 3. Alternatively, you can use a full WebSocket endpoint:
    - Key: `BROWSER_WS_ENDPOINT`
-   - Value: `wss://chrome.browserless.io?token=[Your-API-Key]`
+   - Value: `wss://production-sfo.browserless.io?token=[Your-API-Key]`
 
 The engine will automatically detect these variables and switch to remote mode.
 

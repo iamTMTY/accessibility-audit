@@ -76,7 +76,7 @@ export async function runAudit(html, options = {}) {
       console.warn('Local browser launch failed, checking for remote fallback...');
       
       const wsEndpoint = process.env.BROWSER_WS_ENDPOINT || 
-                        (process.env.BROWSERLESS_API_KEY ? `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_API_KEY}` : null);
+                        (process.env.BROWSERLESS_API_KEY ? `wss://production-sfo.browserless.io?token=${process.env.BROWSERLESS_API_KEY}` : null);
       
       if (wsEndpoint) {
         console.log('Connecting to remote browser...');
