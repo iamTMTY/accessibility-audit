@@ -26,6 +26,7 @@ export default function Home() {
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [filter, setFilter] = useState({ severity: null, level: null, category: null });
   const [wcagLevel, setWcagLevel] = useState('AA');
+  const [error, setError] = useState(null);
 
   const runScan = useCallback(async (htmlOverride, urlOverride = null) => {
     const htmlToScan = typeof htmlOverride === 'string' ? htmlOverride : html;
@@ -33,6 +34,7 @@ export default function Home() {
     
     setIsScanning(true);
     setSelectedIssue(null);
+    setError(null);
     
     try {
       const response = await fetch('/api/audit', {
@@ -42,9 +44,16 @@ export default function Home() {
       });
       
       const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Scan failed');
+      }
+      
       setResults(data);
-    } catch (error) {
-      console.error('Scan failed:', error);
+    } catch (err) {
+      console.error('Scan failed:', err);
+      setError(err.message);
+      setResults(null);
     } finally {
       setIsScanning(false);
     }
@@ -113,8 +122,19 @@ export default function Home() {
           />
         </section>
 
+        {/* Error Section */}
+        {error && (
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3 animate-fade-in">
+            <AlertCircle className="text-red-500 mt-0.5 shrink-0" size={18} />
+            <div>
+              <h3 className="text-sm font-semibold text-red-500">Analysis Failed</h3>
+              <p className="text-sm text-red-400/80 mt-1">{error}</p>
+            </div>
+          </div>
+        )}
+
         {/* Results Section */}
-        {results && (
+        {results && results.issues && (
           <div className="space-y-10 animate-fade-in">
             {/* Stats Overview */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-6">

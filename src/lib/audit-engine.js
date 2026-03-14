@@ -68,9 +68,27 @@ export async function runAudit(html, options = {}) {
   }
   
   try {
-    // Launch headless Chromium
-    browser = await chromium.launch({ headless: true });
+    // Launch browser (Primary: Local, Fallback: Remote for Vercel)
+    try {
+      console.log('Attempting to launch local browser...');
+      browser = await chromium.launch({ headless: true });
+    } catch (localError) {
+      console.warn('Local browser launch failed, checking for remote fallback...');
+      
+      const wsEndpoint = process.env.BROWSER_WS_ENDPOINT || 
+                        (process.env.BROWSERLESS_API_KEY ? `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_API_KEY}` : null);
+      
+      if (wsEndpoint) {
+        console.log('Connecting to remote browser...');
+        browser = await chromium.connectOverCDP(wsEndpoint);
+      } else {
+        // If local failed and no remote config is present, rethrow the original error
+        throw new Error(`Browser launch failed: ${localError.message}. Please install Playwright browsers or provide a BROWSERLESS_API_KEY.`);
+      }
+    }
+    
     const page = await browser.newPage();
+
     
     // If we have a live URL, use `page.goto` so stylesheets, fonts, and assets load natively!
     // Otherwise fallback to raw HTML injections (which may lack external styles)

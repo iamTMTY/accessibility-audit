@@ -47,9 +47,9 @@ const SEVERITY_ICONS = {
 };
 
 export function IssueCard({ issue, isSelected, onClick }) {
-  const severityVariant = issue.severity === 'error' ? 'error' : issue.severity === 'warning' ? 'warning' : 'info';
-  const wcagVariant = `wcag-${issue.level.toLowerCase()}`;
-  const CategoryIcon = CATEGORY_ICONS[issue.category] || CATEGORY_ICONS.default;
+  const severityVariant = (issue?.severity === 'error') ? 'error' : (issue?.severity === 'warning') ? 'warning' : 'info';
+  const wcagVariant = `wcag-${(issue?.level || 'AA').toLowerCase()}`;
+  const CategoryIcon = CATEGORY_ICONS[issue?.category] || CATEGORY_ICONS.default;
 
   return (
     <div

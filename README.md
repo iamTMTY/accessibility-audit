@@ -43,12 +43,19 @@ An accessibility auditing tool built with Next.js, axe-core and Playwright. This
 
 4.  Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📖 How It Works
+### Production Deployment (Vercel)
 
-The engine uses **Playwright** to launch a headless Chromium instance. It injects the **axe-core** testing engine into the page (live URL or raw HTML) to perform deep DOM analysis. This allows the tool to:
-1.  Verify computed styles (like contrast) exactly as they appear to the user.
-2.  Interact with the DOM in a real-world browser environment.
-3.  Capture precise visual screenshots of violations using Playwright's native locator screenshotting.
+To run Playwright in Vercel's serverless environment, you need a remote browser service. 
+
+1. Sign up for a free account at [Browserless.io](https://www.browserless.io/).
+2. Add your **API Key** to your Vercel Environment Variables:
+   - Key: `BROWSERLESS_API_KEY`
+   - Value: `[Your-API-Key]`
+3. Alternatively, you can use a full WebSocket endpoint:
+   - Key: `BROWSER_WS_ENDPOINT`
+   - Value: `wss://chrome.browserless.io?token=[Your-API-Key]`
+
+The engine will automatically detect these variables and switch to remote mode.
 
 ## ⚖️ License
 
