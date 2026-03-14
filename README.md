@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🔍 Accessibility Audit Engine
 
-## Getting Started
+A professional-grade, state-of-the-art accessibility auditing tool built with Next.js and Playwright. This application allows developers and designers to scan websites or HTML snippets for WCAG violations and offers actionable remediation steps with visual context.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+-   **Dual Audit Modes**: Scan live websites via URL or test specific components by pasting HTML snippets.
+-   **Professional Results**: Detailed breakdown of violations mapped to WCAG 2.1 levels (A, AA, AAA).
+-   **Visual Context**: Automatically captures high-quality screenshots of the specific elements failing accessibility checks.
+-   **In-Depth Analysis**:
+    -   **Contrast Ratios**: Real-time foreground/background color analysis and compliance ratios.
+    -   **Element Inspector**: View the exact HTML source code of the offending element.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tools
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+-   **Audit Engine**: [axe-core](https://github.com/dequelabs/axe-core)
+-   **Automation/Screenshotting**: [Playwright](https://playwright.dev/)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Getting Started
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+-   Node.js 18+
+-   Playwright Browsers (installed automatically on first run or via `npx playwright install`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  Clone the repository:
+    ```bash
+    git clone [repository-url]
+    cd accessibility-audit
+    ```
 
-## Deploy on Vercel
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4.  Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📖 How It Works
+
+The engine uses **Playwright** to launch a headless Chromium instance. It injects the **axe-core** testing engine into the page (live URL or raw HTML) to perform deep DOM analysis. This allows the tool to:
+1.  Verify computed styles (like contrast) exactly as they appear to the user.
+2.  Interact with the DOM in a real-world browser environment.
+3.  Capture precise visual screenshots of violations using Playwright's native locator screenshotting.
+
+## ⚖️ License
+
+Distributed under the MIT License. See `LICENSE` for more information.
