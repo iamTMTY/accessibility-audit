@@ -36,6 +36,9 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${inter.variable} font-sans`}>
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         {children}
       </body>
     </html>

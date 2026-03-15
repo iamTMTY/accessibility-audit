@@ -111,7 +111,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-12 relative">
+      <main id="main-content" className="max-w-7xl mx-auto px-6 py-12 relative" tabIndex="-1">
         {/* Input Section */}
         <section className="mb-20 animate-slide-up relative z-10">
           <HtmlInput

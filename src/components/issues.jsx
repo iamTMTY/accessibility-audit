@@ -63,6 +63,9 @@ export function IssueCard({ issue, isSelected, onClick }) {
           onClick();
         }
       }}
+      aria-expanded={isSelected}
+      aria-controls={`issue-details-${issue?.id}`}
+      aria-label={`${issue?.severity} in ${issue?.category}: ${issue?.message}. Click to ${isSelected ? 'collapse' : 'expand'} details.`}
       className={`
         glass p-4 rounded-xl border transition-all duration-300 cursor-pointer overflow-hidden
         ${isSelected 
@@ -98,12 +101,13 @@ export function IssueCard({ issue, isSelected, onClick }) {
             </div>
             <ChevronRight 
               size={16} 
+              aria-hidden="true"
               className={`flex-shrink-0 transition-transform duration-300 text-[var(--color-text-tertiary)] ${isSelected ? 'rotate-90 text-[var(--color-accent)]' : ''}`}
             />
           </div>
 
           {/* Inline Expansion Container */}
-          <div className="grid-expand-wrapper" data-expanded={isSelected}>
+          <div id={`issue-details-${issue?.id}`} className="grid-expand-wrapper" data-expanded={isSelected}>
             <div className="grid-expand-content">
               <div className="mt-6 pt-6 border-t border-[var(--color-glass-border)] space-y-4">
                 {/* Detailed Rule Info */}

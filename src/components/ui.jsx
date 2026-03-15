@@ -40,11 +40,11 @@ export function ScoreCircle({ score, size = 120 }) {
           style={{ transition: 'stroke-dashoffset 0.5s ease' }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-[var(--color-text-primary)]">
+      <div className="absolute inset-0 flex flex-col items-center justify-center" aria-label={`Accessibility score: ${score} out of 100`}>
+        <span className="text-3xl font-bold text-[var(--color-text-primary)]" aria-hidden="true">
           {score}
         </span>
-        <span className="text-xs text-[var(--color-text-tertiary)]">score</span>
+        <span className="text-xs text-[var(--color-text-tertiary)]" aria-hidden="true">score</span>
       </div>
     </div>
   );
@@ -204,6 +204,7 @@ export function Tabs({ tabs, activeTab, onChange }) {
                 : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]/50'
             }
           `}
+          aria-current={activeTab === tab.id ? 'page' : undefined}
         >
           {tab.label}
           {tab.count !== undefined && (

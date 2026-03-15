@@ -141,25 +141,25 @@ export function HtmlInput({ html, onHtmlChange, onScan, isScanning }) {
           </div>
 
             {scanStatus === 'fetching' && (
-              <div className="mt-2 p-3 bg-[var(--color-bg-secondary)] border border-[var(--color-glass-border)] rounded-lg animate-fade-in">
+              <div className="mt-2 p-3 bg-[var(--color-bg-secondary)] border border-[var(--color-glass-border)] rounded-lg animate-fade-in" role="status" aria-live="polite">
                 <p className="text-sm text-[var(--color-text-primary)] flex items-center gap-2 font-medium">
-                  <Globe size={16} className="animate-spin text-[var(--color-accent)]" /> Fetching page content...
+                  <Globe size={16} aria-hidden="true" className="animate-spin text-[var(--color-accent)]" /> Fetching page content...
                 </p>
               </div>
             )}
 
             {scanStatus === 'analyzing' && (
-              <div className="mt-2 p-3 bg-[var(--color-info-bg)] border border-[var(--color-info)]/20 rounded-lg animate-fade-in">
+              <div className="mt-2 p-3 bg-[var(--color-info-bg)] border border-[var(--color-info)]/20 rounded-lg animate-fade-in" role="status" aria-live="polite">
                 <p className="text-sm text-[var(--color-info)] flex items-center gap-2 font-medium">
-                  <Search size={16} className="animate-pulse" /> Analyzing accessibility...
+                  <Search size={16} aria-hidden="true" className="animate-pulse" /> Analyzing accessibility...
                 </p>
               </div>
             )}
 
             {scanStatus === 'done' && (
-              <div className="mt-2 p-3 bg-[var(--color-success-bg)] border border-[var(--color-success)]/20 rounded-lg animate-fade-in">
+              <div className="mt-2 p-3 bg-[var(--color-success-bg)] border border-[var(--color-success)]/20 rounded-lg animate-fade-in" role="status" aria-live="polite">
                 <p className="text-sm text-[var(--color-success)] flex items-center gap-2 font-medium">
-                  <CheckCircle2 size={16} /> Analysis complete. Scroll down to view result
+                  <CheckCircle2 size={16} aria-hidden="true" /> Analysis complete. Scroll down to view result
                 </p>
               </div>
             )}
@@ -208,9 +208,9 @@ export function HtmlInput({ html, onHtmlChange, onScan, isScanning }) {
               <button
                 onClick={() => onHtmlChange('')}
                 className="absolute top-8 right-2 p-1.5 rounded-md bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-primary)] transition-all cursor-pointer active:scale-90 hover:scale-110"
-                aria-label="Clear input"
+                aria-label="Clear HTML input"
               >
-                <Trash2 size={14} className="text-[var(--color-text-tertiary)]" />
+                <Trash2 size={14} aria-hidden="true" className="text-[var(--color-text-tertiary)]" />
               </button>
             )}
           </div>
