@@ -144,18 +144,49 @@ export function IssueCard({ issue, isSelected, onClick }) {
                 {issue.details && issue.details.color && issue.details.bgColor && (
                   <div>
                     <h4 className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-tertiary)] mb-2">Contrast Analysis</h4>
-                    <div className="flex gap-4 p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-glass-border)] rounded-lg flex-wrap">
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[var(--color-glass-border)]" style={{ backgroundColor: issue.details.color }}></div>
-                        <span className="text-xs text-[var(--color-text-primary)]">Text: <code className="bg-[var(--color-bg-secondary)] px-1 rounded">{issue.details.color}</code></span>
+                    <div className="p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-glass-border)] rounded-lg space-y-3">
+                      {/* Color swatches and ratio */}
+                      <div className="flex gap-4 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded border border-[var(--color-glass-border)]" style={{ backgroundColor: issue.details.color }}></div>
+                          <span className="text-xs text-[var(--color-text-primary)]">Text: <code className="bg-[var(--color-bg-secondary)] px-1 rounded">{issue.details.color}</code></span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded border border-[var(--color-glass-border)]" style={{ backgroundColor: issue.details.bgColor }}></div>
+                          <span className="text-xs text-[var(--color-text-primary)]">BG: <code className="bg-[var(--color-bg-secondary)] rounded-md px-1">{issue.details.bgColor}</code></span>
+                        </div>
+                        <div className="ml-auto text-right">
+                          <span className="text-[10px] text-[var(--color-text-tertiary)] block uppercase italic">Ratio</span>
+                          <span className="text-sm font-bold text-[var(--color-text-primary)]">{issue.details.ratio?.toFixed?.(2) || issue.details.ratio}:1</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded border border-[var(--color-glass-border)]" style={{ backgroundColor: issue.details.bgColor }}></div>
-                        <span className="text-xs text-[var(--color-text-primary)]">BG: <code className="bg-[var(--color-bg-secondary)] rounded-md px-1">{issue.details.bgColor}</code></span>
+                      {/* Required ratio and font info */}
+                      <div className="flex gap-4 flex-wrap items-center text-xs text-[var(--color-text-secondary)] border-t border-[var(--color-glass-border)] pt-2">
+                        {issue.details.requiredRatio && (
+                          <span>Required: <strong className="text-[var(--color-text-primary)]">{issue.details.requiredRatio}:1</strong></span>
+                        )}
+                        {issue.details.fontSize && (
+                          <span>Font: <strong className="text-[var(--color-text-primary)]">{issue.details.fontSize}</strong></span>
+                        )}
+                        {issue.details.fontWeight && (
+                          <span>Weight: <strong className="text-[var(--color-text-primary)]">{issue.details.fontWeight}</strong></span>
+                        )}
+                        {issue.details.isLargeText !== undefined && (
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                            issue.details.isLargeText
+                              ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
+                              : 'bg-[var(--color-warning)]/15 text-[var(--color-warning)]'
+                          }`}>
+                            {issue.details.isLargeText ? 'Large text' : 'Normal text'}
+                          </span>
+                        )}
                       </div>
-                      <div className="ml-auto text-right">
-                        <span className="text-[10px] text-[var(--color-text-tertiary)] block uppercase italic">Ratio</span>
-                        <span className="text-sm font-bold text-[var(--color-text-primary)]">{issue.details.ratio?.toFixed?.(2) || issue.details.ratio}:1</span>
+                      {/* Visual preview of text on background */}
+                      <div
+                        className="rounded px-3 py-2 text-center text-sm font-medium border border-[var(--color-glass-border)]"
+                        style={{ color: issue.details.color, backgroundColor: issue.details.bgColor }}
+                      >
+                        Sample Text
                       </div>
                     </div>
                   </div>

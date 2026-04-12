@@ -7,6 +7,80 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * Clean axe-core failureSummary into a concise, human-readable message.
+ * Strips prefixes like "Fix any of the following:\n" and trims whitespace.
+ */
+function cleanFailureSummary(raw) {
+  if (!raw) return null;
+  // Remove the "Fix any/all of the following:" prefix lines
+  let cleaned = raw.replace(/^Fix (?:any|all) of the following:\s*/i, '').trim();
+  // If multiple lines remain, take only the first substantive line
+  const lines = cleaned.split('\n').map(l => l.trim()).filter(Boolean);
+  return lines[0] || cleaned;
+}
+
+/**
+ * Generate a specific, actionable fix suggestion based on the violation and node data.
+ */
+function generateFixSuggestion(violation, node, contrastDetails) {
+  const ruleId = violation.id;
+
+  if (ruleId === 'color-contrast' && contrastDetails) {
+    const textType = contrastDetails.isLargeText ? 'large text' : 'normal text';
+    return `Increase contrast between text (${contrastDetails.color}) and background (${contrastDetails.bgColor}). Current ratio is ${contrastDetails.ratio?.toFixed(2)}:1 but ${textType} requires at least ${contrastDetails.requiredRatio}:1. Darken the text or lighten the background.`;
+  }
+
+  if (ruleId === 'image-alt') {
+    return 'Add a descriptive alt attribute to this image, or set alt="" if it is purely decorative.';
+  }
+  if (ruleId === 'label') {
+    return 'Associate a visible <label> with this form control using the "for" attribute, or add an aria-label/aria-labelledby attribute.';
+  }
+  if (ruleId === 'button-name') {
+    return 'Add text content, an aria-label, or an aria-labelledby attribute so the button has an accessible name.';
+  }
+  if (ruleId === 'link-name') {
+    return 'Ensure this link has visible text, an aria-label, or an aria-labelledby attribute that describes its destination.';
+  }
+  if (ruleId === 'html-has-lang') {
+    return 'Add a lang attribute to the <html> element (e.g., <html lang="en">).';
+  }
+  if (ruleId === 'document-title') {
+    return 'Add a descriptive <title> element inside <head>.';
+  }
+  if (ruleId === 'duplicate-id' || ruleId === 'duplicate-id-active' || ruleId === 'duplicate-id-aria') {
+    return 'Ensure every id attribute value on the page is unique.';
+  }
+  if (ruleId === 'heading-order') {
+    return 'Restructure headings so they increase by one level at a time (e.g., h1 then h2, not h1 then h3).';
+  }
+  if (ruleId === 'list' || ruleId === 'listitem') {
+    return 'Ensure list items (<li>) are direct children of <ul>, <ol>, or <menu> elements.';
+  }
+  if (ruleId === 'tabindex') {
+    return 'Avoid tabindex values greater than 0. Use tabindex="0" or tabindex="-1" instead.';
+  }
+
+  // Fallback: use axe-core's help text
+  return violation.help;
+}
+
+/**
+ * Generate a refined human-readable message for contrast issues with full context.
+ */
+function generateContrastMessage(contrastDetails) {
+  if (!contrastDetails) return null;
+  const { color, bgColor, ratio, requiredRatio, isLargeText, fontSize, fontWeight } = contrastDetails;
+  const textType = isLargeText ? 'large' : 'normal';
+  let msg = `Insufficient contrast: ${color} on ${bgColor} has ratio ${ratio?.toFixed(2)}:1 (requires ${requiredRatio}:1 for ${textType} text)`;
+  if (fontSize) {
+    msg += `. Font: ${fontSize}`;
+    if (fontWeight) msg += `, weight ${fontWeight}`;
+  }
+  return msg;
+}
+
 // Map axe-core tags to our app's visual categories
 function mapAxeTagsToCategory(tags) {
   if (tags.includes('cat.images') || tags.includes('cat.text-alternatives')) return 'images';
@@ -55,13 +129,27 @@ export async function runAudit(html, options = {}) {
   };
 
   function getContrastDetails(node) {
-    const contrastCheck = node.any?.find(c => c.id === 'color-contrast');
+    // axe-core may place contrast data in any, all, or none check arrays
+    const contrastCheck =
+      node.any?.find(c => c.id === 'color-contrast') ||
+      node.all?.find(c => c.id === 'color-contrast') ||
+      node.none?.find(c => c.id === 'color-contrast');
     if (contrastCheck && contrastCheck.data) {
+      const d = contrastCheck.data;
+      const fontSize = d.fontSize ? parseFloat(d.fontSize) : null;
+      const fontWeight = d.fontWeight ? parseFloat(d.fontWeight) : null;
+      // WCAG defines "large text" as >= 18pt (24px) or >= 14pt (18.66px) bold (>=700)
+      const isLargeText = fontSize !== null && (
+        fontSize >= 24 || (fontSize >= 18.66 && fontWeight !== null && fontWeight >= 700)
+      );
       return {
-        color: contrastCheck.data.fgColor,
-        bgColor: contrastCheck.data.bgColor,
-        ratio: contrastCheck.data.contrastRatio,
-        requiredRatio: contrastCheck.data.expectedContrastRatio
+        color: d.fgColor,
+        bgColor: d.bgColor,
+        ratio: d.contrastRatio,
+        requiredRatio: d.expectedContrastRatio,
+        fontSize: d.fontSize || null,
+        fontWeight: d.fontWeight ? String(d.fontWeight) : null,
+        isLargeText
       };
     }
     return null;
@@ -177,6 +265,10 @@ export async function runAudit(html, options = {}) {
           console.warn(`[Audit Warning] Could not capture screenshot canvas for: ${node.target.join(' > ')} | Reason:`, err.message);
         }
 
+        const contrastDetails = getContrastDetails(node);
+        const contrastMsg = generateContrastMessage(contrastDetails);
+        const cleanedMessage = cleanFailureSummary(node.failureSummary) || violation.help;
+
         issues.push({
           id: `issue-${issues.length + 1}`,
           ruleId: violation.id,
@@ -186,12 +278,12 @@ export async function runAudit(html, options = {}) {
           impact: node.impact || violation.impact || 'moderate',
           category,
           description: violation.description,
-          message: node.failureSummary || violation.help,
+          message: (violation.id === 'color-contrast' && contrastMsg) ? contrastMsg : cleanedMessage,
           element: node.html?.substring(0, 100),
           selector: node.target.join(' > '),
           confidence: 1.0,
-          fix: { suggestion: violation.help },
-          details: getContrastDetails(node),
+          fix: { suggestion: generateFixSuggestion(violation, node, contrastDetails) },
+          details: contrastDetails,
           helpUrl: violation.helpUrl,
           screenshot: base64Screenshot
         });
